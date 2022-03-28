@@ -19,9 +19,7 @@ option (scalapb.options) = {
 
 service SuperMarketServiceProto {
   rpc CreateTransaction (AddTransactionToRetail) returns (TransactionReply);
-  rpc GetTransactionById(GetTransaction) returns (TransactionReply){
-    option (google.api.http) = { post: "/retail/{retailId}" body: "*"};
-  };
+  rpc GetTransactionById(GetTransaction) returns (TransactionReply);
 }
 
 message Transaction {

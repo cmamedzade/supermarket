@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "scalapb/scalapb.proto";
+import "google/api/annotations.proto";
+
+option java_multiple_files = false;
+option java_package = "com.supermarket.az";
+option java_outer_classname = "SuperMarketProto";
+
+option (scalapb.options) = {
+  lenses: true,
+  retain_source_code_info: true,
+  single_file: true,
+  preamble: "sealed trait SuperMarketMessages extends scalapb.GeneratedMessage",
+  preamble: "sealed trait SuperMarketCmd extends SuperMarketMessages",
+  preamble: "sealed trait SuperMarketQuery extends SuperMarketMessages"
+};
+
+service SuperMarketServiceProto {
+  rpc CreateTransaction (AddTransactionToRetail) returns (TransactionReply);
+  rpc GetTransactionById(GetTransaction) returns (TransactionReply){
+    option (google.api.http) = { post: "/retail/{retailId}" body: "*"};
+  };
+}
+
+message Transaction {
+  string uuId = 1;
+  string marketId = 2;
+  double transactionAmount = 3;
+  int64 currency = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}
+
+message TransactionReply {
+  string replyMessage = 1;
+}
+
+message AddTransactionToRetail {
+  option (scalapb.message).extends = "SuperMarketCmd";
+  string retailId = 1;
+  Transaction transaction = 2 [(scalapb.field).no_box = true];
+  string replTo = 3;
+}
+
+message GetTransaction {
+  option (scalapb.message).extends = "SuperMarketQuery";
+  string retailId = 1;
+  string tId = 2;
+  string replyTo = 3;
+}
+
+message CommandQuery{
+  oneof sealed_value {
+    AddTransactionToRetail addTransactionToRetail = 1;
+    GetTransaction getTransaction = 2;
+  }
+}
